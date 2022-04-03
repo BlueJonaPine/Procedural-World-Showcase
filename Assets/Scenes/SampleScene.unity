@@ -4250,7 +4250,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Made by BluePine
+  m_Text: Made by BlueJonaPine
 --- !u!222 &716819808
 CanvasRenderer:
   m_ObjectHideFlags: 0
