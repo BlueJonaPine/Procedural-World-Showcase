@@ -53,6 +53,7 @@ public class TerrainCreator : MonoBehaviour
     private Color32[] lighthouseNoiseTexturePixels;
 
     private float[,] terrainPerlinNoise;
+    private float waterCubeScaleY;
 
     private int boatHousesGenerated;
     private bool lightHouseGenerated;
@@ -72,7 +73,7 @@ public class TerrainCreator : MonoBehaviour
 
     const int MAX_SEAGULLS_PER_TILE = 5;
     const int MIN_SEAGULLS_PER_TILE = 1;
-    const float SEAGULL_SPAWN_HEIGHT = 1.3f;
+    const float SEAGULL_SPAWN_HEIGHT = 1f;
     const int BOAT_SPAWN_CHANCE_PERCENTAGE_PER_TILE = 3;
 
     /* Constant values that are related to the noise value (0-1) and influence the generation. */
@@ -153,7 +154,8 @@ public class TerrainCreator : MonoBehaviour
         lighthouseNoiseTexturePixels = new Color32[lighthouseNoiseTexture.width * lighthouseNoiseTexture.height];
         lighthouseNoiseHeightmapPlane.GetComponent<Renderer>().material.mainTexture = lighthouseNoiseTexture;
 
-        waterCube.transform.localScale = new Vector3(waterCube.transform.localScale.x, (Globals.instance.GetSeaLevel() * Globals.instance.heightScale) + 0.99f, waterCube.transform.localScale.z);
+        waterCubeScaleY = (Globals.instance.GetSeaLevel() * Globals.instance.heightScale) + 0.99f;
+        waterCube.transform.localScale = new Vector3(waterCube.transform.localScale.x, waterCubeScaleY, waterCube.transform.localScale.z);
     }
 
     void Update()
@@ -284,6 +286,10 @@ public class TerrainCreator : MonoBehaviour
             }
         }
 
+        if (terrainGenerationIsAnimated)
+        {
+            StartCoroutine(AnimateWaterGeneration());
+        }
         waterCube.SetActive(true);
 
         isTerrainCreated = true;
@@ -295,6 +301,22 @@ public class TerrainCreator : MonoBehaviour
         UpdateNoiseMaskTextures();
         GenerateEnvironment();
     }
+
+    IEnumerator AnimateWaterGeneration()
+    {
+        waterCube.transform.localScale = new Vector3(waterCube.transform.localScale.x, waterCubeScaleY / 100f, waterCube.transform.localScale.z);
+
+        while (waterCube.transform.localScale.y < waterCubeScaleY - 0.01f)
+        {
+            float y_scale = Mathf.Lerp(waterCube.transform.localScale.y, waterCubeScaleY, 2f * Time.deltaTime);
+            waterCube.transform.localScale = new Vector3(waterCube.transform.localScale.x, y_scale, waterCube.transform.localScale.z);
+
+            yield return null;
+        }
+
+        waterCube.transform.localScale = new Vector3(waterCube.transform.localScale.x, waterCubeScaleY, waterCube.transform.localScale.z);
+    }
+
     private void UpdateNoiseMaskTextures()
     {
         treeNoiseTexture.SetPixels32(treeNoiseTexturePixels);
@@ -733,7 +755,7 @@ public class TerrainCreator : MonoBehaviour
             else if (tree_chance <= 40)
                 go = (GameObject)Instantiate(Resources.Load("Prefabs/Tree_simple7"), environmentParent.transform);
             else if (tree_chance <= 50)
-                go = (GameObject)Instantiate(Resources.Load("Prefabs/Tree_simple1"), environmentParent.transform);
+                go = (GameObject)Instantiate(Resources.Load("Prefabs/Tree_simple11"), environmentParent.transform);
             else if (tree_chance <= 55)
                 go = (GameObject)Instantiate(Resources.Load("Prefabs/Tree_Stump1"), environmentParent.transform);
             else if (tree_chance <= 60)
@@ -749,9 +771,9 @@ public class TerrainCreator : MonoBehaviour
             if (tree_chance <= 10)
                 go = (GameObject)Instantiate(Resources.Load("Prefabs/Tree_simple6"), environmentParent.transform);
             else if (tree_chance <= 75)
-                go = (GameObject)Instantiate(Resources.Load("Prefabs/Tree_simple1"), environmentParent.transform);
+                go = (GameObject)Instantiate(Resources.Load("Prefabs/Tree_simple11"), environmentParent.transform);
             else if (tree_chance <= 90)
-                go = (GameObject)Instantiate(Resources.Load("Prefabs/Tree_simple3"), environmentParent.transform);
+                go = (GameObject)Instantiate(Resources.Load("Prefabs/Tree_simple12"), environmentParent.transform);
             else if (tree_chance <= 93)
                 go = (GameObject)Instantiate(Resources.Load("Prefabs/Tree_Dead1"), environmentParent.transform);
             else if (tree_chance <= 96)
@@ -765,11 +787,11 @@ public class TerrainCreator : MonoBehaviour
             float tree_chance = Mathf.InverseLerp(TREE_MIN_NOISE_LEVEL_PER_TILE, TREE_MAX_NOISE_LEVEL_PER_TILE, tree_noise_level) * 100;
 
             if (tree_chance <= 20)
-                go = (GameObject)Instantiate(Resources.Load("Prefabs/Tree_simple1"), environmentParent.transform);
+                go = (GameObject)Instantiate(Resources.Load("Prefabs/Tree_simple11"), environmentParent.transform);
             else if (tree_chance <= 60)
-                go = (GameObject)Instantiate(Resources.Load("Prefabs/Tree_simple3"), environmentParent.transform);
+                go = (GameObject)Instantiate(Resources.Load("Prefabs/Tree_simple12"), environmentParent.transform);
             else if (tree_chance <= 80)
-                go = (GameObject)Instantiate(Resources.Load("Prefabs/Tree_simple4"), environmentParent.transform);
+                go = (GameObject)Instantiate(Resources.Load("Prefabs/Tree_simple13"), environmentParent.transform);
             else if (tree_chance <= 90)
                 go = (GameObject)Instantiate(Resources.Load("Prefabs/Tree_Dead1"), environmentParent.transform);
             else if (tree_chance <= 95)
